@@ -36,20 +36,25 @@ GROUP BY mot.customer_id, dim.category
 
 -- Question 3: Find out the top 10 cross border items with the highest quantity sold. The output includes minimum selling price, total spent (gmv) and total orders.
 
-SELECT  dim.product_name
-		, dim.category
-		, MIN(orders.price) AS min_selling_price
-		, SUM(orders.qty_sold) AS total_qty_sold
-		, SUM(orders.gmv) AS total_gmv
-		, COUNT(DISTINCT orders.order_id) AS total_order
-		, DENSE_RANK() OVER(ORDER BY SUM(orders.qty_sold) DESC) AS rank
-FROM my_order_trans AS orders
-JOIN dim_product AS dim 
-	ON dim.product_id = orders.product_id
-WHERE is_crossborder = True
-GROUP BY product_name, category
+SELECT *
+FROM
+(
+	SELECT  dim.product_name
+			, dim.category
+			, MIN(orders.price) AS min_selling_price
+			, SUM(orders.qty_sold) AS total_qty_sold
+			, SUM(orders.gmv) AS total_gmv
+			, COUNT(DISTINCT orders.order_id) AS total_order
+			, DENSE_RANK() OVER(ORDER BY SUM(orders.qty_sold) DESC) AS rank
+	FROM my_order_trans AS orders
+	JOIN dim_product AS dim 
+		ON dim.product_id = orders.product_id
+	WHERE is_crossborder = True	
+	GROUP BY product_name, category
+) abc
+WHERE rank <=10
 
--- Question 4: Find the average time (in day) between their first and second checkout of our customers.
+-- -- Question 4: Find the average time (in day) between their first and second checkout of our customers.
 
 SELECT 	AVG(DATE_PART('day', order_date)) AS avg_time
 FROM
@@ -61,4 +66,3 @@ FROM
 	GROUP BY customer_id, order_date
 ) AS abc	  
 WHERE order_of_date <= 2
-
