@@ -17,6 +17,8 @@ FROM
 	GROUP BY artist_name
 ) AS abc
 WHERE artist_rank <= 5
+![My Image](Q1.png)
+
 
 -- Question 2: Find the lifetime total orders, total spent (GMV), unique items bought , earliest purchase date, last purchased date, average amount spent per order (AOV) and average purchase price (APP) for the following buyer IDs.
 
@@ -33,6 +35,7 @@ JOIN dim_product AS dim
 	ON mot.product_id = dim.product_id
 WHERE mot.customer_id IN ('1076216361964070','3190859517651870','3754202390878020')
 GROUP BY mot.customer_id, dim.category
+![My Image](Q2.png)
 
 -- Question 3: Find out the top 10 cross border items with the highest quantity sold. The output includes minimum selling price, total spent (gmv) and total orders.
 
@@ -53,6 +56,7 @@ FROM
 	GROUP BY product_name, category
 ) abc
 WHERE rank <=10
+![My Image](Q3.png)
 
 -- -- Question 4: Find the average time (in day) between their first and second checkout of our customers.
 
@@ -66,3 +70,4 @@ FROM
 	GROUP BY customer_id, order_date
 ) AS abc	  
 WHERE order_of_date <= 2
+![My Image](Q4.png)
