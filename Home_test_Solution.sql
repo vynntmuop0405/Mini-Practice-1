@@ -51,15 +51,27 @@ FROM
 ) abc
 WHERE rank <=10
 
--- -- Question 4: Find the average time (in day) between their first and second checkout of our customers.
+-- Question 4: Find the average time (in day) between their first and second checkout of our customers.
 
-SELECT 	AVG(DATE_PART('day', order_date)) AS avg_time
-FROM
+WITH abc AS
 (
-	SELECT 	customer_id
+	SELECT customer_id
 			, order_date
 			, ROW_NUMBER() OVER(PARTITION BY customer_id ORDER BY order_date) AS order_of_date
 	FROM my_order_trans
 	GROUP BY customer_id, order_date
-) AS abc	  
-WHERE order_of_date <= 2
+),
+ghi AS (
+	SELECT  distinct_id.customer_id,
+		(SELECT order_date FROM abc WHERE abc.customer_id = distinct_id.customer_id AND order_of_date = 1 LIMIT 1) AS first_order,
+		(SELECT order_date FROM abc WHERE abc.customer_id = distinct_id.customer_id AND order_of_date = 2 LIMIT 1) AS second_order
+	FROM (
+		SELECT DISTINCT(customer_id) AS customer_id
+		FROM my_order_trans
+	) AS distinct_id
+)
+SELECT 	AVG((DATE_PART('doy', ghi.second_order) - DATE_PART('doy', ghi.first_order))) 
+FROM ghi
+WHERE second_order IS NOT NULL
+
+
